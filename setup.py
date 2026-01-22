@@ -25,10 +25,10 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/caoyc/BionicMemory",
     packages=find_packages(),
+    license="MIT",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
@@ -51,7 +51,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "bionicmemory=scripts.start_server:main",
+            "bionicmemory=scripts.uvicorn_start:main",
         ],
     },
     include_package_data=True,

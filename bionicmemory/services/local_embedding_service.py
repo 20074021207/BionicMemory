@@ -1,7 +1,12 @@
 import logging
 import numpy as np
 from typing import List, Optional
-from sentence_transformers import SentenceTransformer
+try:
+    from sentence_transformers import SentenceTransformer
+    from transformers import PreTrainedModel, AutoModel
+except ImportError as e:
+    logging.getLogger(__name__).error(f"导入依赖失败: {e}")
+    SentenceTransformer = None
 import torch
 import hashlib
 import threading
@@ -46,6 +51,9 @@ class LocalEmbeddingService:
     
     def _initialize_model(self):
         """初始化模型，只执行一次"""
+        if SentenceTransformer is None:
+            raise ImportError("SentenceTransformer 未正确导入，请检查依赖安装。")
+            
         try:
             # 获取用户设置
             user_model_name = os.getenv('LOCAL_EMBEDDING_MODEL', 'Qwen/Qwen3-Embedding-0.6B')
@@ -76,12 +84,12 @@ class LocalEmbeddingService:
                 
                 # 使用 SentenceTransformer 自动下载模型
                 logger.info(f"正在下载模型: {user_model_name}")
-                self.model = SentenceTransformer(user_model_name, cache_folder=cache_dir_abs)
+                self.model = SentenceTransformer(user_model_name, cache_folder=cache_dir_abs, trust_remote_code=True)
                 logger.info("模型下载完成！")
             else:
                 logger.info(f"使用本地模型: {model_name_abs}")
                 # 使用绝对路径
-                self.model = SentenceTransformer(model_name_abs, cache_folder=cache_dir_abs)
+                self.model = SentenceTransformer(model_name_abs, cache_folder=cache_dir_abs, trust_remote_code=True)
             
             # 设置为评估模式
             self.model.eval()
